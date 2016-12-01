@@ -247,7 +247,7 @@ namespace IdentityServer3.Core
                             {
                                 { Flows.AuthorizationCode, new[] { ResponseModes.Query, ResponseModes.FormPost } },
                                 { Flows.AuthorizationCodeWithProofKey, new[] { ResponseModes.Query, ResponseModes.FormPost } },
-                                { Flows.Implicit, new[] { ResponseModes.Fragment, ResponseModes.FormPost }},
+                                { Flows.Implicit, new[] { ResponseModes.Fragment, ResponseModes.FormPost, ResponseModes.Json }},
                                 { Flows.Hybrid, new[] { ResponseModes.Fragment, ResponseModes.FormPost }},
                                 { Flows.HybridWithProofKey, new[] { ResponseModes.Fragment, ResponseModes.FormPost }}
                             };
@@ -257,12 +257,14 @@ namespace IdentityServer3.Core
             public const string FormPost = "form_post";
             public const string Query    = "query";
             public const string Fragment = "fragment";
+            public const string Json = "json";
         }
 
         public static readonly List<string> SupportedResponseModes = new List<string>
                             {
                                 ResponseModes.FormPost,
                                 ResponseModes.Query,
+                                ResponseModes.Json,
                                 ResponseModes.Fragment,
                             };
 
@@ -736,6 +738,7 @@ namespace IdentityServer3.Core
             public const string IdentityServerOrigin = "idsrv:IdentityServerOrigin";
 
             public const string RequestId = "idsrv:RequestId";
+            public const string AnonymousId = "idsrv:AnonymousId";
         }
 
         public static class Authentication
@@ -744,6 +747,7 @@ namespace IdentityServer3.Core
             public const string SignoutId                   = "id";
             public const string KatanaAuthenticationType    = "katanaAuthenticationType";
             public const string PartialLoginRememberMe      = "idsvr:rememberme";
+            public const string AnonymousAuthenticationType = "anon";
         }
 
         public static class LocalizationCategories

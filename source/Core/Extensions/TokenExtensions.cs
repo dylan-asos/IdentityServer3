@@ -50,6 +50,7 @@ namespace IdentityServer3.Core.Models
 
             var amrClaims = token.Claims.Where(x => x.Type == Constants.ClaimTypes.AuthenticationMethod);
             var jsonClaims = token.Claims.Where(x => x.ValueType == Constants.ClaimValueTypes.Json);
+            var scopeClaims = token.Claims.Where(x => x.ValueType == Constants.ClaimTypes.Scope);
             var normalClaims = token.Claims.Except(amrClaims).Except(jsonClaims);
 
             payload.AddClaims(normalClaims);
@@ -59,6 +60,12 @@ namespace IdentityServer3.Core.Models
             if (amrValues.Any())
             {
                 payload.Add(Constants.ClaimTypes.AuthenticationMethod, amrValues);
+            }
+
+            var scopeValues = scopeClaims.Select(x => x.Value).Distinct().ToArray();
+            if (scopeValues.Any())
+            {
+                payload.Add(Constants.ClaimTypes.Scope, scopeValues);
             }
 
             // deal with json types

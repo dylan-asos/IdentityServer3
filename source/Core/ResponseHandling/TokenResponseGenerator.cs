@@ -135,6 +135,27 @@ namespace IdentityServer3.Core.ResponseHandling
                 response.RefreshToken = accessToken.Item2;
             }
 
+            //////////////////////////
+            // id token
+            /////////////////////////
+            if (!request.Scopes.Contains(Constants.StandardScopes.OpenId))
+            {
+                return response;
+            }
+
+            var tokenRequest = new TokenCreationRequest
+            {
+                Subject = request.Subject,
+                Client = request.Client,
+                Scopes = request.ValidatedScopes.RequestedScopes,
+                ValidatedRequest = request,
+                AccessTokenToHash = accessToken.Item1
+            };
+
+            var idToken = await _tokenService.CreateIdentityTokenAsync(tokenRequest);
+            var jwt = await _tokenService.CreateSecurityTokenAsync(idToken);
+            response.IdentityToken = jwt;
+
             return response;
         }
 

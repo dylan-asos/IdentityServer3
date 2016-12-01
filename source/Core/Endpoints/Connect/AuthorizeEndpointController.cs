@@ -34,6 +34,10 @@ using System.Web.Http;
 
 namespace IdentityServer3.Core.Endpoints
 {
+    using System.Linq;
+
+    using IdentityModel;
+
     /// <summary>
     /// OAuth2/OpenID Connect authorize endpoint
     /// </summary>
@@ -138,18 +142,30 @@ namespace IdentityServer3.Core.Endpoints
             }
 
             // user must be authenticated at this point
-            if (!User.Identity.IsAuthenticated)
+            if (User.Identity.IsAuthenticated)
             {
-                throw new InvalidOperationException("User is not authenticated");
+                request.Subject = User as ClaimsPrincipal;
             }
-
-            request.Subject = User as ClaimsPrincipal;
+            else
+            {
+                request.Subject = Principal.Create(
+                    "anon",
+                    new DefaultAnonymousClaimsProvider { CurrentAnonymousId = Request.GetOwinContext().Get<string>(Constants.OwinEnvironment.AnonymousId) }.GetAnonymousClaims(
+                        request.Client,
+                        request.ValidatedScopes.RequestedScopes).ToArray());
+            }
+            
 
             // now that client configuration is loaded, we can do further validation
             loginInteraction = await _interactionGenerator.ProcessClientLoginAsync(request);
             if (loginInteraction.IsLogin)
             {
                 return this.RedirectToLogin(loginInteraction.SignInMessage, request.Raw);
+            }
+
+            if (request.CanCreateAnonymousToken())
+            {
+                return await CreateAuthorizeResponseAsync(request);
             }
 
             var consentInteraction = await _interactionGenerator.ProcessConsentAsync(request, consent);
@@ -188,9 +204,39 @@ namespace IdentityServer3.Core.Endpoints
             return await ProcessRequestAsync(parameters);
         }
 
+        private void IssueAnonymousLoginCookies(ValidatedAuthorizeRequest request)
+        {
+            var context = Request.GetOwinContext();
+            var sub = request.Subject.GetSubjectId();
+
+            context.Authentication.SignOut(Constants.ExternalAuthenticationType, Constants.PartialSignInAuthenticationType);
+            context.Environment.IssueLoginCookie(
+                new AuthenticatedLogin
+                {
+                    AuthenticationMethod = "anon",
+                    PersistentLogin = false,
+                    IdentityProvider = "site",
+                    Claims = request.Subject.Claims,
+                    Subject = sub,
+                    Name = sub
+                });
+        }
+
+
         private async Task<IHttpActionResult> CreateAuthorizeResponseAsync(ValidatedAuthorizeRequest request)
         {
             var response = await _responseGenerator.CreateResponseAsync(request);
+
+            if (request.CanCreateAnonymousToken())
+            {
+                IssueAnonymousLoginCookies(request);
+            }
+
+            if (request.ResponseMode == Constants.ResponseModes.Json)
+            {
+                await RaiseSuccessEventAsync();
+                return new AuthorizeJsonResult(response, Request);
+            }
 
             if (request.ResponseMode == Constants.ResponseModes.Query ||
                 request.ResponseMode == Constants.ResponseModes.Fragment)

@@ -105,7 +105,7 @@ namespace IdentityServer3.Core.Services.Default
                 }
             }
 
-            if (additionalClaims.Count > 0)
+            if (additionalClaims.Count > 0 && !request.Subject.IsAnonymousAuthenticationMethod())
             {
                 var context = new ProfileDataRequestContext(
                     subject,
@@ -163,10 +163,7 @@ namespace IdentityServer3.Core.Services.Default
             }
 
             // add scopes
-            foreach (var scope in scopes)
-            {
-                outputClaims.Add(new Claim(Constants.ClaimTypes.Scope, scope.Name));
-            }
+            outputClaims.AddRange(from scope in scopes where scope.Type == ScopeType.Resource select new Claim(Constants.ClaimTypes.Scope, scope.Name));
 
             // a user is involved
             if (subject != null)

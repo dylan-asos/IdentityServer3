@@ -160,6 +160,7 @@ namespace IdentityServer3.Core.Extensions
 
             var options = env.ResolveDependency<IdentityServerOptions>();
             var sessionCookie = env.ResolveDependency<SessionCookie>();
+            var anonymousCookie = env.ResolveDependency<AnonymousCookie>();
             var context = new OwinContext(env);
 
             var props = new AuthenticationProperties();
@@ -205,6 +206,11 @@ namespace IdentityServer3.Core.Extensions
 
             context.Authentication.SignIn(props, identity);
             sessionCookie.IssueSessionId(login.PersistentLogin, login.PersistentLoginExpiration);
+
+            if (user.IsAnonymousAuthenticationMethod())
+            {
+                anonymousCookie.IssueAnonymousId();
+            }
         }
 
         /// <summary>

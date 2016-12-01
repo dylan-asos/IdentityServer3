@@ -24,10 +24,16 @@ namespace IdentityServer3.Core.Configuration
         }
 
         const string SessionCookieName = "idsvr.session";
+        const string AnonymousCookieName = "idsvr.anon";
 
         public static string GetSessionCookieName(this CookieOptions options)
         {
             return options.GetCookieName(SessionCookieName);
+        }
+
+        public static string GetAnonymousCookieName(this CookieOptions options)
+        {
+            return options.GetCookieName(AnonymousCookieName);
         }
 
         internal static bool? CalculateRememberMeFromUserInput(this CookieOptions options, bool? userInput)

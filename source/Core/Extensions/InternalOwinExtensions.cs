@@ -49,6 +49,13 @@ namespace IdentityServer3.Core.Extensions
             env[Constants.OwinEnvironment.RequestId] = id;
         }
 
+        public static void SetAnonymousId(this IDictionary<string, object> env, string id)
+        {
+            if (env == null) throw new ArgumentNullException("env");
+
+            env[Constants.OwinEnvironment.AnonymousId] = id;
+        }
+
         public static void SetIdentityServerHost(this IDictionary<string, object> env, string value)
         {
             if (env == null) throw new ArgumentNullException("env");

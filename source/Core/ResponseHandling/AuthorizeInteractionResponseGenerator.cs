@@ -114,6 +114,12 @@ namespace IdentityServer3.Core.ResponseHandling
                 };
             }
 
+            // anonymous user
+            if (request.AnonymousTokenRequested)
+            {
+                return new LoginInteractionResponse();
+            }
+
             // unauthenticated user
             var isAuthenticated = user.Identity.IsAuthenticated;
             if (!isAuthenticated) Logger.Info("User is not authenticated. Redirecting to login.");

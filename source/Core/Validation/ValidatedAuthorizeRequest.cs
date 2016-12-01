@@ -203,6 +203,17 @@ namespace IdentityServer3.Core.Validation
         }
 
         /// <summary>
+        /// Gets a value that indicates whether an anonymous token was requested using the acr_values
+        /// </summary>
+        public bool AnonymousTokenRequested
+        {
+            get
+            {
+                return AuthenticationContextReferenceClasses.Contains("0");
+            }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ValidatedAuthorizeRequest"/> class.
         /// </summary>
         public ValidatedAuthorizeRequest()

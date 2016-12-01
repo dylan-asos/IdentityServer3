@@ -128,6 +128,7 @@
       <Link>Properties\VersionAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="App_Packages\LibLog.4.2\LibLog.cs" />
+    <Compile Include="Configuration\AppBuilderExtensions\ConfigureAnonymousIdExtension.cs" />
     <Compile Include="Configuration\AppBuilderExtensions\ConfigureRenderLoggedOutPageExtension.cs" />
     <Compile Include="Configuration\AppBuilderExtensions\ConfigureRequestBodyBufferExtension.cs" />
     <Compile Include="Configuration\AppBuilderExtensions\ConfigureSignOutMessageCookieExtension.cs" />
@@ -139,6 +140,7 @@
     <Compile Include="Configuration\CookieSecureMode.cs" />
     <Compile Include="Configuration\DiscoveryOptions.cs" />
     <Compile Include="Configuration\EventsOptions.cs" />
+    <Compile Include="Configuration\Hosting\AnonymousCookie.cs" />
     <Compile Include="Configuration\Hosting\ClientListCookie.cs" />
     <Compile Include="Configuration\InputLengthRestrictions.cs" />
     <Compile Include="Configuration\IAuthenticationSessionStoreProvider.cs" />
@@ -213,6 +215,7 @@
     <Compile Include="Logging\NoopLogProvider.cs" />
     <Compile Include="Models\ClientPermissionDescription.cs" />
     <Compile Include="Models\Contexts\ExternalAuthenticationContext.cs" />
+    <Compile Include="Models\JwtTokenResponse.cs" />
     <Compile Include="Models\ParsedSecret.cs" />
     <Compile Include="Models\Contexts\PostAuthenticationContext.cs" />
     <Compile Include="Models\Contexts\ProfileDataRequestContext.cs" />
@@ -232,6 +235,7 @@
       <DependentUpon>T4resx.tt</DependentUpon>
     </Compile>
     <Compile Include="ResponseHandling\IntrospectionResponseGenerator.cs" />
+    <Compile Include="Results\AuthorizeJsonResult.cs" />
     <Compile Include="Results\CheckSessionResult.cs" />
     <Compile Include="Results\RevocationErrorResult.cs" />
     <Compile Include="Results\IntrospectionResult.cs" />
@@ -239,12 +243,14 @@
     <Compile Include="Services\Caching\CachingClientStore.cs" />
     <Compile Include="Services\Caching\CachingUserService.cs" />
     <Compile Include="Services\Caching\CachingScopeStore.cs" />
+    <Compile Include="Services\DefaultAnonymousClaimsProvider.cs" />
     <Compile Include="Services\DefaultViewService\DefaultViewServiceOptions.cs" />
     <Compile Include="Services\DefaultViewService\DefaultViewServiceRegistration.cs" />
     <Compile Include="Services\Default\DefaultAuthenticationSessionValidator.cs" />
     <Compile Include="Services\Default\DefaultCustomTokenResponseGenerator.cs" />
     <Compile Include="Services\Default\DefaultSigningKeyService.cs" />
     <Compile Include="Services\Default\DefaultTokenSigningService.cs" />
+    <Compile Include="Services\IAnonymousClaimsProvider.cs" />
     <Compile Include="Services\IAuthenticationSessionValidator.cs" />
     <Compile Include="Services\ICustomTokenResponseGenerator.cs" />
     <Compile Include="Services\ISigningKeyService.cs" />
@@ -508,7 +514,9 @@
     <None Include="..\default.licenseheader">
       <Link>default.licenseheader</Link>
     </None>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="bundleconfig.json" />
     <None Include="Resources\T4resx.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

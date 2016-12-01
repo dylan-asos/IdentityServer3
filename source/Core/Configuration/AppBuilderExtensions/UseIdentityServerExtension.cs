@@ -72,6 +72,7 @@ namespace Owin
             app.UseEmbeddedFileServer();
 
             app.ConfigureRequestId();
+            app.ConfigureAnonymousId(options);
             app.ConfigureDataProtectionProvider(options);
             app.ConfigureIdentityServerBaseUrl(options.PublicOrigin);
             app.ConfigureIdentityServerIssuer(options);

@@ -26,6 +26,11 @@ namespace IdentityServer3.Core.Extensions
 {
     internal static class ValidatedAuthorizeRequestExtensions
     {
+        public static bool CanCreateAnonymousToken(this ValidatedAuthorizeRequest validatedRequest)
+        {
+            return validatedRequest.AnonymousTokenRequested && validatedRequest.Subject.IsAnonymousAuthenticationMethod();
+        }
+
         public static IEnumerable<ConsentScopeViewModel> GetIdentityScopes(this ValidatedAuthorizeRequest validatedRequest, ILocalizationService localizationService)
         {
             var requestedScopes = validatedRequest.ValidatedScopes.RequestedScopes.Where(x => x.Type == ScopeType.Identity);
