@@ -141,7 +141,7 @@ namespace IdentityServer3.Core.Endpoints
                 return this.RedirectToLogin(loginInteraction.SignInMessage, request.Raw);
             }
 
-            // user must be authenticated at this point
+            // we're either authenticated at this point, or it's an anonymous token request
             if (User.Identity.IsAuthenticated)
             {
                 request.Subject = User as ClaimsPrincipal;
