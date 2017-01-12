@@ -163,65 +163,69 @@ namespace IdentityServer3.Core.Services.Default
             }
 
             // add scopes
-            outputClaims.AddRange(from scope in scopes where scope.Type == ScopeType.Resource select new Claim(Constants.ClaimTypes.Scope, scope.Name));
-
-            // a user is involved
-            if (subject != null)
+            foreach (var scope in scopes)
             {
-                outputClaims.AddRange(GetStandardSubjectClaims(subject));
-                outputClaims.AddRange(GetOptionalClaims(subject));
+                outputClaims.Add(new Claim(Constants.ClaimTypes.Scope, scope.Name));
+            }
+            
+            if (subject == null)
+            {
+                return outputClaims;
+            }
 
-                // if a include all claims rule exists, call the user service without a claims filter
-                if (scopes.IncludesAllClaimsForUserRule(ScopeType.Resource))
-                {
-                    var context = new ProfileDataRequestContext(
+            outputClaims.AddRange(GetStandardSubjectClaims(subject));
+            outputClaims.AddRange(GetOptionalClaims(subject));
+
+            // if a include all claims rule exists, call the user service without a claims filter
+            if (scopes.IncludesAllClaimsForUserRule(ScopeType.Resource))
+            {
+                var context = new ProfileDataRequestContext(
                     subject,
                     client,
                     Constants.ProfileDataCallers.ClaimsProviderAccessToken);
 
-                    await _users.GetProfileDataAsync(context);
+                await _users.GetProfileDataAsync(context);
 
-                    var claims = FilterProtocolClaims(context.IssuedClaims);
-                    if (claims != null)
-                    {
-                        outputClaims.AddRange(claims);
-                    }
-
-                    return outputClaims;
+                var claims = FilterProtocolClaims(context.IssuedClaims);
+                if (claims != null)
+                {
+                    outputClaims.AddRange(claims);
                 }
 
+                return outputClaims;
+            }
 
-                // fetch all resource claims that need to go into the access token
-                var additionalClaims = new List<string>();
-                foreach (var scope in scopes)
+
+            // fetch all resource claims that need to go into the access token
+            var additionalClaims = new List<string>();
+            foreach (var scope in scopes)
+            {
+                if (scope.Type == ScopeType.Resource)
                 {
-                    if (scope.Type == ScopeType.Resource)
+                    if (scope.Claims != null)
                     {
-                        if (scope.Claims != null)
+                        foreach (var scopeClaim in scope.Claims)
                         {
-                            foreach (var scopeClaim in scope.Claims)
-                            {
-                                additionalClaims.Add(scopeClaim.Name);
-                            }
+                            additionalClaims.Add(scopeClaim.Name);
                         }
                     }
                 }
+            }
 
-                if (additionalClaims.Count > 0)
-                {
-                    var context = new ProfileDataRequestContext(
+            if (additionalClaims.Count > 0)
+            {
+                var context = new ProfileDataRequestContext(
                     subject,
                     client,
                     Constants.ProfileDataCallers.ClaimsProviderAccessToken,
                     additionalClaims.Distinct());
 
-                    await _users.GetProfileDataAsync(context);
+                await _users.GetProfileDataAsync(context);
 
-                    var claims = FilterProtocolClaims(context.IssuedClaims);
-                    if (claims != null)
-                    {
-                        outputClaims.AddRange(claims);
-                    }
+                var claims = FilterProtocolClaims(context.IssuedClaims);
+                if (claims != null)
+                {
+                    outputClaims.AddRange(claims);
                 }
             }
 

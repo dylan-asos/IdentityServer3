@@ -2,6 +2,7 @@
 {
     using System;
     using System.ComponentModel;
+    using System.Security.Claims;
 
     using IdentityServer3.Core.Extensions;
 
@@ -20,12 +21,12 @@
             identityServerOptions = options;
         }
 
-        public virtual void IssueAnonymousId()
+        public virtual void IssueAnonymousId(ClaimsIdentity identity)
         {
             var path = context.Request.Environment.GetIdentityServerBasePath().CleanUrlPath();
             DateTimeOffset offset = DateTimeHelper.UtcNow.Add(identityServerOptions.AuthenticationOptions.CookieOptions.ExpireTimeSpan);
 
-            context.Response.Cookies.Append(GetCookieName(), context.Request.User.GetSubjectId(), new CookieOptions { Path = path, Secure = true, Expires = offset.UtcDateTime });
+            context.Response.Cookies.Append(GetCookieName(), identity.GetSubjectId(), new CookieOptions { Path = path, Secure = true, Expires = offset.UtcDateTime });
         }
 
         private string GetCookieName()

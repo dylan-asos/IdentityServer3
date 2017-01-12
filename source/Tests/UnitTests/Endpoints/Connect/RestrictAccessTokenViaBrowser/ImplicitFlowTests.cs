@@ -24,6 +24,8 @@ using Xunit;
 
 namespace IdentityServer3.Tests.Endpoints.Connect.RestrictAccessTokenViaBrowser
 {
+    using Newtonsoft.Json;
+
     public class ImplicitFlowTests : IdentityServerHostTest
     {
         const string Category = "Endpoint.Authorize.ImplicitFlow";
@@ -148,6 +150,29 @@ namespace IdentityServer3.Tests.Endpoints.Connect.RestrictAccessTokenViaBrowser
 
             // user error page - no protocol response
             result.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+
+        [Fact]
+        [Trait("Category", Category)]
+        public void Implicit_client_can_request_anonuymous_token_as_json()
+        {
+            var url = host.GetAuthorizeUrl(
+                client_id,
+                redirect_uri,
+                scope,
+                "id_token token", 
+                response_mode: "json",       
+                acr_values: "0",
+                nonce: "nonce");
+
+            var result = host.Client.GetAsync(url).Result;
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var content = result.Content.ReadAsStringAsync().Result;
+            var tokenResponse = JsonConvert.DeserializeObject<JwtTokenResponse>(content);
+
+            tokenResponse.AccessToken.Length.Should().BeGreaterThan(1);
         }
     }
 }

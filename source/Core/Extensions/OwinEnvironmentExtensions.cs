@@ -209,7 +209,7 @@ namespace IdentityServer3.Core.Extensions
 
             if (user.IsAnonymousAuthenticationMethod())
             {
-                anonymousCookie.IssueAnonymousId();
+                anonymousCookie.IssueAnonymousId(identity);
             }
         }
 

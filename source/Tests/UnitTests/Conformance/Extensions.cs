@@ -221,7 +221,9 @@ namespace IdentityServer3.Tests.Conformance
             string state = null,
             string nonce = null,
             string code_challenge = null,
-            string code_challenge_method = null)
+            string code_challenge_method = null,
+            string response_mode = null,
+            string acr_values = null)
         {
             var disco = host.GetDiscoveryDocument();
             disco["authorization_endpoint"].Should().NotBeNull();
@@ -264,6 +266,16 @@ namespace IdentityServer3.Tests.Conformance
             if (code_challenge_method.IsPresent())
             {
                 query += "&code_challenge_method=" + HttpUtility.UrlEncode(code_challenge_method);
+            }
+
+            if (response_mode.IsPresent())
+            {
+                query += "&response_mode=" + HttpUtility.UrlEncode(response_mode);
+            }
+
+            if (acr_values.IsPresent())
+            {
+                query += "&acr_values=" + HttpUtility.UrlEncode(acr_values);
             }
 
             if (query.StartsWith("&"))

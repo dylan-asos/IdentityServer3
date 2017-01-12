@@ -149,7 +149,15 @@ namespace IdentityServer3.Core.Extensions
         /// <returns>True if amr claim is anon, otherwise false</returns>
         public static bool IsAnonymousAuthenticationMethod(this IPrincipal principal)
         {
-            return (principal.Identity as ClaimsIdentity).Claims.HasAnonymousAuthenticationMethod();
+            var claimsPrincipal = principal as ClaimsPrincipal;
+            if (claimsPrincipal == null)
+            {
+                return false;
+            }
+
+            var identity = claimsPrincipal.Identity as ClaimsIdentity;
+
+            return identity != null && identity.Claims.HasAnonymousAuthenticationMethod();
         }
 
         /// <summary>
